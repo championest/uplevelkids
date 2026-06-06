@@ -14,6 +14,7 @@ export default function BattleEngine() {
   const [operation, setOperation] = useState<Operation>('addition');
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('1-digit');
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
+  const [nextProblem, setNextProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState(0);
@@ -27,6 +28,7 @@ export default function BattleEngine() {
     setTimeLeft(60);
     setStatus('playing');
     setCurrentProblem(generateProblem(operation, difficulty));
+    setNextProblem(generateProblem(operation, difficulty));
     setUserAnswer('');
     setTimeout(() => inputRef.current?.focus(), 100);
   }, [operation, difficulty]);
@@ -58,7 +60,8 @@ export default function BattleEngine() {
       setScore((s) => s + 1);
       setCombo((c) => c + 1);
       setFeedback('correct');
-      setCurrentProblem(generateProblem(operation, difficulty));
+      setCurrentProblem(nextProblem ?? generateProblem(operation, difficulty));
+      setNextProblem(generateProblem(operation, difficulty));
       setUserAnswer('');
     } else {
       setCombo(0);
@@ -250,11 +253,17 @@ export default function BattleEngine() {
                       />
                     </form>
 
-                    <Numpad 
+                    <Numpad
                       onInput={handleNumpadInput}
                       onDelete={handleNumpadDelete}
                       onSubmit={handleSubmit}
                     />
+                    {nextProblem && (
+                      <div className="flex items-center justify-center gap-3 opacity-50">
+                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em]">Next</span>
+                        <span className="text-2xl font-black text-slate-400 tracking-tight">{nextProblem.question}</span>
+                      </div>
+                    )}
                   </div>
               </div>
             </motion.div>

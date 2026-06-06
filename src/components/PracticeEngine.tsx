@@ -36,6 +36,7 @@ export default function PracticeEngine() {
   const [customSec, setCustomSec] = useState<string>('0');
 
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
+  const [nextProblem, setNextProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -57,13 +58,16 @@ export default function PracticeEngine() {
   });
   stateRef.current = { status, currentProblem, userAnswer, operation, difficulty, tables };
 
-  const nextProblem = useCallback(() => {
+  const genNext = useCallback(() => {
     return generateProblem(
       stateRef.current.operation,
       stateRef.current.difficulty,
       isMulDiv ? stateRef.current.tables : undefined
     );
   }, [isMulDiv]);
+
+  const nextProblemRef = useRef<Problem | null>(null);
+  nextProblemRef.current = nextProblem;
 
   const start = () => {
     if (isMulDiv && tables.length === 0) return;
@@ -74,11 +78,9 @@ export default function PracticeEngine() {
     setUserAnswer('');
     setTimeLeft(durationSec);
     setStatus('playing');
-    // Generate first problem AFTER status set so ref is fresh
     setTimeout(() => {
-      setCurrentProblem(
-        generateProblem(operation, difficulty, isMulDiv ? tables : undefined)
-      );
+      setCurrentProblem(generateProblem(operation, difficulty, isMulDiv ? tables : undefined));
+      setNextProblem(generateProblem(operation, difficulty, isMulDiv ? tables : undefined));
     }, 0);
   };
 
@@ -117,7 +119,8 @@ export default function PracticeEngine() {
         return next;
       });
       setFeedback('correct');
-      setCurrentProblem(nextProblem());
+      setCurrentProblem(nextProblemRef.current ?? genNext());
+      setNextProblem(genNext());
       setUserAnswer('');
     } else {
       setIncorrect((i) => i + 1);
@@ -126,7 +129,7 @@ export default function PracticeEngine() {
     }
 
     setTimeout(() => setFeedback(null), 400);
-  }, [nextProblem]);
+  }, [genNext]);
 
   const handleInput = useCallback((val: string) => {
     setUserAnswer((p) => (p.length >= 6 ? p : p + val));
@@ -458,6 +461,14 @@ export default function PracticeEngine() {
                     onDelete={handleDelete}
                     onSubmit={handleSubmit}
                   />
+
+                  {/* Next problem preview */}
+                  {nextProblem && (
+                    <div className="w-full flex items-center justify-center gap-3 opacity-50">
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em]">Next</span>
+                      <span className="text-2xl font-black text-slate-400 tracking-tight">{nextProblem.question}</span>
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-between w-full px-2">
                     <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">

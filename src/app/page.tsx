@@ -3,7 +3,7 @@
 import ProfileCard from "@/components/ProfileCard";
 import AvatarStore from "@/components/AvatarStore";
 import Link from "next/link";
-import { Play, Trophy, Settings, Star, Zap, Target, CheckCircle2, Dumbbell } from "lucide-react";
+import { Play, Trophy, Settings, Star, Zap, Target, CheckCircle2, Dumbbell, Swords } from "lucide-react";
 import { motion } from "framer-motion";
 import { useGame } from "@/lib/GameContext";
 import { ACHIEVEMENTS } from "@/lib/rpg";
@@ -16,6 +16,7 @@ export default function Home() {
   const menuItems = [
     { id: 'play', label: 'Start Mission', icon: Play, href: '/play', color: 'bg-indigo-500', shadow: 'shadow-indigo-500/40' },
     { id: 'practice', label: 'Practice', icon: Dumbbell, href: '/practice', color: 'bg-cyan-500', shadow: 'shadow-cyan-500/40' },
+    { id: 'lobby', label: 'Battle Online', icon: Swords, href: '/lobby', color: 'bg-purple-500', shadow: 'shadow-purple-500/40' },
     { id: 'leaderboard', label: 'Rankings', icon: Trophy, href: '/leaderboard', color: 'bg-yellow-500', shadow: 'shadow-yellow-500/40' },
   ];
 
