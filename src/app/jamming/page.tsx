@@ -58,8 +58,8 @@ export default function JammingPage() {
             <span className="font-display text-base">กลับ</span>
           </Link>
           <div className="text-right">
-            <p className="font-display text-base text-[#2b1d57]">แจม</p>
-            <p className="text-xs text-[#2b1d57]/60">Jamming · ไม่มีจับเวลา</p>
+            <p className="font-display text-base text-[#2b1d57]">ผจญภัยชิวๆ</p>
+            <p className="text-xs text-[#2b1d57]/60">Chill Quest · ไม่มีจับเวลา</p>
           </div>
         </header>
 
