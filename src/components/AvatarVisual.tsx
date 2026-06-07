@@ -23,77 +23,84 @@ function getEmoji(id: string | null): string | null {
   return SHOP_ITEMS.find((i) => i.id === id)?.image ?? null;
 }
 
+// Aura visuals — each aura id maps to a colored halo gradient
+const AURA_GRADIENT: Record<string, string> = {
+  aura_1: 'radial-gradient(circle, rgba(255,210,63,0.55) 0%, rgba(255,111,181,0.35) 40%, transparent 70%)',
+  aura_2: 'radial-gradient(circle, rgba(155,109,255,0.55) 0%, rgba(76,201,255,0.35) 40%, transparent 70%)',
+};
+
 export default function AvatarVisual({ size = 'md', className }: AvatarVisualProps) {
   const { state } = useGame();
   const px = SIZE_MAP[size];
 
   const hatEmoji = getEmoji(state.equipped.hat);
-  const auraEmoji = getEmoji(state.equipped.aura);
+  const auraId = state.equipped.aura;
+  const auraGradient = auraId ? AURA_GRADIENT[auraId] : null;
   const petEmoji = getEmoji(state.equipped.pet);
 
   return (
     <div
-      className={cn('relative inline-flex items-center justify-center', className)}
+      className={cn('relative inline-block shrink-0', className)}
       style={{ width: px, height: px }}
     >
-      {/* Aura — orbiting sparkle emoji (matches illustrated style, not blur gradient) */}
-      {auraEmoji && (
-        <>
-          {[0, 1, 2, 3].map((i) => (
-            <motion.span
-              key={i}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: i * -1.5 }}
-              className="absolute inset-0 z-0 pointer-events-none"
-              style={{ transformOrigin: 'center' }}
-            >
-              <span
-                className="absolute top-0 left-1/2 -translate-x-1/2 select-none"
-                style={{ fontSize: px * 0.18, transform: `translate(-50%, -10%) rotate(${i * 90}deg)` }}
-              >
-                {auraEmoji}
-              </span>
-            </motion.span>
-          ))}
-        </>
+      {/* Aura — soft circular halo behind the mascot */}
+      {auraGradient && (
+        <motion.div
+          animate={{ scale: [1, 1.08, 1], opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-[-18%] rounded-full pointer-events-none z-0"
+          style={{ background: auraGradient }}
+        />
       )}
 
-      {/* Mascot body */}
-      <Mascot mood="happy" size={px} className="relative z-10" />
+      {/* Mascot body — anchored centered */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center">
+        <Mascot mood="happy" size={px} />
+      </div>
 
-      {/* Hat — emoji sits on top of head */}
+      {/* Hat — sits on top of head, centered horizontally */}
       {hatEmoji && (
-        <motion.div
-          animate={{ y: [0, -3, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute z-30 leading-none drop-shadow-lg select-none"
+        <div
+          className="absolute z-30 pointer-events-none"
           style={{
-            fontSize: px * 0.45,
-            top: -px * 0.05,
+            top: -px * 0.18,
             left: '50%',
-            transform: 'translateX(-50%)',
+            width: px * 0.55,
+            height: px * 0.55,
+            marginLeft: -(px * 0.55) / 2,
           }}
         >
-          {hatEmoji}
-        </motion.div>
+          <motion.div
+            animate={{ y: [0, -3, 0] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-full h-full flex items-center justify-center select-none"
+            style={{ fontSize: px * 0.45, lineHeight: 1, filter: 'drop-shadow(0 3px 4px rgba(43,29,87,0.25))' }}
+          >
+            {hatEmoji}
+          </motion.div>
+        </div>
       )}
 
-      {/* Pet — emoji sits at bottom-right inside avatar bounds */}
+      {/* Pet — small framed badge at bottom-right of avatar */}
       {petEmoji && (
-        <motion.div
-          animate={{ x: [0, 3, 0], y: [0, -2, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute z-30 leading-none select-none flex items-center justify-center bg-white rounded-2xl border-2 border-white shadow"
+        <div
+          className="absolute z-30 pointer-events-none"
           style={{
             width: px * 0.4,
             height: px * 0.4,
-            right: -px * 0.02,
-            bottom: -px * 0.02,
-            fontSize: px * 0.26,
+            right: -px * 0.05,
+            bottom: -px * 0.05,
           }}
         >
-          {petEmoji}
-        </motion.div>
+          <motion.div
+            animate={{ y: [0, -2, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-full h-full bg-white rounded-2xl border-2 border-white shadow flex items-center justify-center select-none"
+            style={{ fontSize: px * 0.26, lineHeight: 1 }}
+          >
+            {petEmoji}
+          </motion.div>
+        </div>
       )}
     </div>
   );
