@@ -22,8 +22,8 @@ export default function GigPage() {
             <span className="font-display text-base">กลับ</span>
           </Link>
           <div className="text-right">
-            <p className="font-display text-base text-[#2b1d57]">คอนเสิร์ต</p>
-            <p className="text-xs text-[#2b1d57]/60">Gig · 100 ข้อ 5 นาที</p>
+            <p className="font-display text-base text-[#2b1d57]">ภารกิจใหญ่</p>
+            <p className="text-xs text-[#2b1d57]/60">Boss Quest · 100 ข้อ 5 นาที</p>
           </div>
         </header>
 
@@ -32,7 +32,7 @@ export default function GigPage() {
           durationSec={300}
           problemLimit={100}
           buildProblem={makeGigProblem}
-          title="คอนเสิร์ตใหญ่"
+          title="ปราบบอสมังกร"
           metaLine="100 ข้อ × ทุกแม่ · 5 นาที"
           gradient="linear-gradient(160deg, #ffd23f, #ff9a3c)"
         />

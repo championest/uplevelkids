@@ -112,7 +112,7 @@ export default function RechargePage() {
         <div className="kid-card p-4 flex items-center gap-3">
           <Mascot mood="cheer" size={70} />
           <div className="flex-1">
-            <p className="font-display text-xl text-[#2b1d57] leading-tight">เร่งสปีดให้ Bobo!</p>
+            <p className="font-display text-xl text-[#2b1d57] leading-tight">ติดปีกให้ฮีโร่!</p>
             <p className="text-xs text-[#2b1d57]/60">ของแต่งตัวทุกชิ้นยังเก็บเองได้ฟรี · ไม่บังคับซื้อ</p>
           </div>
         </div>
@@ -150,11 +150,11 @@ export default function RechargePage() {
               </div>
             </section>
 
-            {/* Rock Pass */}
+            {/* Hero Pass */}
             <section className="space-y-2">
               <h2 className="font-display text-lg text-[#2b1d57] ml-2 flex items-center gap-1">
                 <Sparkles className="w-4 h-4 text-[#ffd23f]" />
-                Rock Pass · พรีเมียม
+                พาสนักผจญภัย · พรีเมียม
               </h2>
               <div className="space-y-3">
                 {PREMIUM_PASSES.map((pass) => (

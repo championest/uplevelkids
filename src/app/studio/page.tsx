@@ -27,8 +27,8 @@ export default function StudioPage() {
             <span className="font-display text-base">กลับ</span>
           </Link>
           <div className="text-right">
-            <p className="font-display text-base text-[#2b1d57]">สตูดิโอ</p>
-            <p className="text-xs text-[#2b1d57]/60">Studio · วัดเรท</p>
+            <p className="font-display text-base text-[#2b1d57]">หอฝึก</p>
+            <p className="text-xs text-[#2b1d57]/60">Dojo · วัดเรทตอบ</p>
           </div>
         </header>
 
@@ -36,7 +36,7 @@ export default function StudioPage() {
           mode="studio"
           durationSec={60}
           buildProblem={makeStudioProblem}
-          title="สตูดิโอ 1 นาที"
+          title="หอฝึก 1 นาที"
           metaLine="ทุกแบบโจทย์ · เร็วเท่าไรยิ่งดี"
           gradient="linear-gradient(160deg, #4cc9ff, #5ddc7e)"
         />

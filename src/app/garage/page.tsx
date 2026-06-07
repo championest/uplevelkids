@@ -156,8 +156,8 @@ export default function GaragePage() {
             <span className="font-display text-base">กลับ</span>
           </Link>
           <div className="text-right">
-            <p className="font-display text-base text-[#2b1d57]">โรงรถ</p>
-            <p className="text-xs text-[#2b1d57]/60">Garage · ซ้อมที่ยังอ่อน</p>
+            <p className="font-display text-base text-[#2b1d57]">ห้องซ้อม</p>
+            <p className="text-xs text-[#2b1d57]/60">Training · ซ้อมจุดอ่อน</p>
           </div>
         </header>
 

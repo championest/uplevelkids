@@ -1,7 +1,7 @@
 /**
  * TTRS-style coin economy: different modes pay different rates so kids
  * are pushed toward Garage/Gig for grinding while still rewarding the
- * speed-focused modes that drive Rock Status.
+ * speed-focused modes that drive the Explorer rank.
  */
 export type GameMode =
   | 'studio'
@@ -62,9 +62,9 @@ export const MODES: ModeMeta[] = [
   },
   {
     id: 'soundcheck',
-    th: 'เช็คฝีมือ',
-    en: 'Soundcheck',
-    emoji: '🎤',
+    th: 'ทดสอบฝีมือ',
+    en: 'Daily Quest',
+    emoji: '⚔️',
     desc: 'รายวัน · 25 ข้อ',
     href: '/soundcheck',
     bgFrom: '#ff6fb5',
@@ -72,9 +72,9 @@ export const MODES: ModeMeta[] = [
   },
   {
     id: 'garage',
-    th: 'โรงรถ',
-    en: 'Garage',
-    emoji: '🔧',
+    th: 'ห้องซ้อม',
+    en: 'Training',
+    emoji: '📚',
     desc: 'ซ้อมจุดอ่อน · เหรียญเยอะ',
     href: '/garage',
     bgFrom: '#9b6dff',
@@ -82,9 +82,9 @@ export const MODES: ModeMeta[] = [
   },
   {
     id: 'studio',
-    th: 'สตูดิโอ',
-    en: 'Studio',
-    emoji: '🎧',
+    th: 'หอฝึก',
+    en: 'Dojo',
+    emoji: '🏯',
     desc: '1 นาที วัดเรทตอบ',
     href: '/studio',
     bgFrom: '#4cc9ff',
@@ -92,9 +92,9 @@ export const MODES: ModeMeta[] = [
   },
   {
     id: 'jamming',
-    th: 'แจม',
-    en: 'Jamming',
-    emoji: '🎸',
+    th: 'ผจญภัยชิวๆ',
+    en: 'Chill Quest',
+    emoji: '🌿',
     desc: 'ไม่มีจับเวลา · สบายใจ',
     href: '/jamming',
     bgFrom: '#5ddc7e',
@@ -102,9 +102,9 @@ export const MODES: ModeMeta[] = [
   },
   {
     id: 'gig',
-    th: 'คอนเสิร์ต',
-    en: 'Gig',
-    emoji: '🪩',
+    th: 'ภารกิจใหญ่',
+    en: 'Boss Quest',
+    emoji: '🐉',
     desc: '100 ข้อ · 5 นาที',
     href: '/gig',
     bgFrom: '#ffd23f',
@@ -113,7 +113,7 @@ export const MODES: ModeMeta[] = [
   {
     id: 'festival',
     th: 'ดวลเพื่อน',
-    en: 'Battle',
+    en: 'PvP',
     emoji: '⚔️',
     desc: 'แข่งเรียลไทม์',
     href: '/lobby',

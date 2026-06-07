@@ -69,7 +69,7 @@ export default function AvatarStore() {
               >
                 <div>
                   <h2 className="font-display text-2xl text-[#2b1d57]">ร้านของแต่งตัว</h2>
-                  <p className="text-xs text-[#2b1d57]/60">เลือกของให้ Bobo · {SHOP_ITEMS.length} ชิ้น</p>
+                  <p className="text-xs text-[#2b1d57]/60">แต่งฮีโร่ของหนู · {SHOP_ITEMS.length} ชิ้น</p>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}

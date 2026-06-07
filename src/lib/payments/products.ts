@@ -31,30 +31,30 @@ export interface PremiumPass {
 export const PREMIUM_PASSES: PremiumPass[] = [
   {
     id: 'pass_1m',
-    name: 'Rock Pass — 1 เดือน',
+    name: 'พาสนักผจญภัย — 1 เดือน',
     priceTHB: 99,
     days: 30,
     perks: [
       'รายวัน +100 เหรียญฟรี',
       'ปลดอวตารพรีเมียม',
       'XP ×2 ทุกโหมด',
-      'Soundcheck ได้ 3 รอบ/วัน',
+      'ทดสอบฝีมือได้ 3 รอบ/วัน',
     ],
-    emoji: '🎸',
+    emoji: '🗺️',
   },
   {
     id: 'pass_3m',
-    name: 'Rock Pass — 3 เดือน',
+    name: 'พาสนักผจญภัย — 3 เดือน',
     priceTHB: 249,
     days: 90,
     perks: [
       'รายวัน +150 เหรียญฟรี',
       'ปลดอวตารพรีเมียม',
       'XP ×2 ทุกโหมด',
-      'Soundcheck ได้ 5 รอบ/วัน',
+      'ทดสอบฝีมือได้ 5 รอบ/วัน',
       'เฟรมรายชื่อพิเศษ',
     ],
-    emoji: '🎤',
+    emoji: '⚔️',
   },
 ];
 

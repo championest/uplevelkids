@@ -205,8 +205,8 @@ export default function SoundcheckPage() {
             <span className="font-display text-base">กลับ</span>
           </Link>
           <div className="text-right">
-            <p className="font-display text-base text-[#2b1d57]">เช็คฝีมือ</p>
-            <p className="text-xs text-[#2b1d57]/60">Soundcheck</p>
+            <p className="font-display text-base text-[#2b1d57]">ทดสอบฝีมือ</p>
+            <p className="text-xs text-[#2b1d57]/60">Daily Quest</p>
           </div>
         </header>
 
@@ -237,7 +237,7 @@ export default function SoundcheckPage() {
               style={available ? { background: 'linear-gradient(160deg, #ff6fb5, #9b6dff)' } : undefined}
             >
               <Mic2 className="w-7 h-7" />
-              {available ? 'เริ่ม Soundcheck!' : 'ผ่านวันนี้แล้ว'}
+              {available ? 'เริ่มทดสอบ!' : 'ผ่านวันนี้แล้ว'}
             </motion.button>
           </div>
         )}
@@ -305,7 +305,7 @@ export default function SoundcheckPage() {
               className="rounded-3xl px-5 py-3 border-4 border-white shadow-[0_6px_0_rgba(0,0,0,0.08)]"
               style={{ background: tier.color }}
             >
-              <p className="text-xs font-bold text-white/80">ระดับ Rock Star</p>
+              <p className="text-xs font-bold text-white/80">ระดับนักผจญภัย</p>
               <p className="font-display text-2xl text-white">{tier.emoji} {tier.name}</p>
             </div>
 

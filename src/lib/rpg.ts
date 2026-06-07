@@ -55,15 +55,15 @@ export const SHOP_ITEMS: Item[] = [
   { id: 'top_lab',      name: 'เสื้อแล็บ',      price: 420, category: 'top', image: '🥼', rarity: 'rare' },
   { id: 'top_king',     name: 'ชุดราชวงศ์',     price: 1500, category: 'top', image: '🤴', rarity: 'legendary' },
 
-  // --- INSTRUMENT (8) ---
-  { id: 'ins_guitar',   name: 'กีตาร์',          price: 80,  category: 'instrument', image: '🎸', rarity: 'common' },
-  { id: 'ins_keys',     name: 'คีย์บอร์ด',       price: 100, category: 'instrument', image: '🎹', rarity: 'common' },
-  { id: 'ins_drum',     name: 'กลอง',            price: 100, category: 'instrument', image: '🥁', rarity: 'common' },
-  { id: 'ins_mic',      name: 'ไมค์เสียง',       price: 120, category: 'instrument', image: '🎤', rarity: 'common' },
-  { id: 'ins_violin',   name: 'ไวโอลิน',        price: 250, category: 'instrument', image: '🎻', rarity: 'rare' },
-  { id: 'ins_sax',      name: 'แซ็กโซโฟน',      price: 280, category: 'instrument', image: '🎷', rarity: 'rare' },
-  { id: 'ins_trumpet',  name: 'ทรัมเป็ต',       price: 240, category: 'instrument', image: '🎺', rarity: 'rare' },
-  { id: 'ins_dj',       name: 'เครื่องดีเจ',     price: 1200, category: 'instrument', image: '🎛️', rarity: 'legendary' },
+  // --- WEAPON / TOOL (8) ---
+  { id: 'ins_sword',    name: 'ดาบเหล็ก',        price: 80,  category: 'instrument', image: '🗡️', rarity: 'common' },
+  { id: 'ins_bow',      name: 'ธนูนักล่า',       price: 100, category: 'instrument', image: '🏹', rarity: 'common' },
+  { id: 'ins_shield',   name: 'โล่กันภัย',       price: 100, category: 'instrument', image: '🛡️', rarity: 'common' },
+  { id: 'ins_axe',      name: 'ขวานยักษ์',       price: 120, category: 'instrument', image: '🪓', rarity: 'common' },
+  { id: 'ins_wand',     name: 'ไม้กายสิทธิ์',     price: 250, category: 'instrument', image: '🪄', rarity: 'rare' },
+  { id: 'ins_scroll',   name: 'คัมภีร์เก่า',     price: 280, category: 'instrument', image: '📜', rarity: 'rare' },
+  { id: 'ins_torch',    name: 'คบเพลิง',         price: 240, category: 'instrument', image: '🔥', rarity: 'rare' },
+  { id: 'ins_crystal',  name: 'ลูกแก้ววิเศษ',    price: 1200, category: 'instrument', image: '🔮', rarity: 'legendary' },
 
   // --- ACCESSORY (7) ---
   { id: 'acc_ribbon',   name: 'โบว์ผูกผม',      price: 40,  category: 'accessory', image: '🎀', rarity: 'common' },
@@ -105,7 +105,7 @@ export const SLOT_LABEL: Record<ItemSlot, { th: string; emoji: string }> = {
   hat: { th: 'หมวก', emoji: '🎩' },
   face: { th: 'ใบหน้า', emoji: '😎' },
   top: { th: 'เสื้อ', emoji: '👕' },
-  instrument: { th: 'เครื่องดนตรี', emoji: '🎸' },
+  instrument: { th: 'อาวุธ', emoji: '🗡️' },
   accessory: { th: 'ของประดับ', emoji: '🎀' },
   aura: { th: 'ออร่า', emoji: '✨' },
   pet: { th: 'สัตว์เลี้ยง', emoji: '🐾' },

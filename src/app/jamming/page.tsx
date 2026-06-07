@@ -31,8 +31,8 @@ export default function JammingPage() {
               <span className="font-display text-base">ตั้งค่า</span>
             </button>
             <div className="text-right">
-              <p className="font-display text-base text-[#2b1d57]">แจม</p>
-              <p className="text-xs text-[#2b1d57]/60">Jamming · ไม่มีจับเวลา</p>
+              <p className="font-display text-base text-[#2b1d57]">ผจญภัยชิวๆ</p>
+              <p className="text-xs text-[#2b1d57]/60">Chill Quest · ไม่มีจับเวลา</p>
             </div>
           </header>
 
@@ -40,7 +40,7 @@ export default function JammingPage() {
             mode="jamming"
             durationSec={0}
             buildProblem={() => generateProblem(op, isMulDiv ? 'table-1-12' : diff)}
-            title="แจมสบายๆ"
+            title="ผจญภัยชิวๆ"
             metaLine={`${OP_INFO.find((o) => o.id === op)?.th} · ไม่มีจับเวลา`}
             gradient="linear-gradient(160deg, #5ddc7e, #ffd23f)"
           />
@@ -112,7 +112,7 @@ export default function JammingPage() {
             className="kid-btn w-full py-5 text-2xl font-display text-white"
             style={{ background: 'linear-gradient(160deg, #5ddc7e, #ffd23f)' }}
           >
-            🎸 เริ่มแจม!
+            🌿 ไปเที่ยวกัน!
           </button>
 
           <p className="text-xs text-[#2b1d57]/60 text-center">โหมดสบาย · ไม่มีจับเวลา · ค่อยๆ คิด</p>

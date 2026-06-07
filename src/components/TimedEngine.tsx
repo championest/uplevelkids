@@ -259,7 +259,7 @@ export default function TimedEngine({
               className="rounded-3xl px-5 py-3 border-4 border-white shadow-[0_6px_0_rgba(0,0,0,0.08)]"
               style={{ background: tier.color }}
             >
-              <p className="text-xs font-bold text-white/80">ระดับ Rock Status</p>
+              <p className="text-xs font-bold text-white/80">ระดับนักผจญภัย</p>
               <p className="font-display text-2xl text-white">{tier.emoji} {tier.name}</p>
             </div>
 
