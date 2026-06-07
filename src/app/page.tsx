@@ -60,24 +60,24 @@ export default function Home() {
 
       <div className="w-full max-w-[500px] relative z-10 space-y-6">
         {/* Top bar — coins + level */}
-        <header className="flex justify-between items-center">
+        <header className="flex justify-between items-center gap-2">
           <div className="flex items-center gap-2 bg-white/90 px-4 py-2.5 rounded-full border-4 border-white shadow-[0_6px_0_rgba(255,210,63,0.6)]">
             <Coins className="w-5 h-5 text-yellow-500" />
             <span className="font-display text-xl text-[#2b1d57] tabular-nums">{state.coins}</span>
           </div>
 
-          <div className="flex items-center gap-2 bg-white/90 px-4 py-2.5 rounded-full border-4 border-white shadow-[0_6px_0_rgba(155,109,255,0.5)]">
-            <Sparkles className="w-5 h-5 text-[#9b6dff]" />
-            <span className="font-display text-xl text-[#2b1d57]">Lv {state.level}</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white/90 px-4 py-2.5 rounded-full border-4 border-white shadow-[0_6px_0_rgba(155,109,255,0.5)]">
+              <Sparkles className="w-5 h-5 text-[#9b6dff]" />
+              <span className="font-display text-xl text-[#2b1d57]">Lv {state.level}</span>
+            </div>
+            <AvatarStore />
           </div>
         </header>
 
         {/* Hero card with Mascot + welcome */}
-        <section className="kid-card p-6 relative overflow-hidden">
-          <div className="absolute -top-6 -right-4 text-5xl kid-sparkle">✨</div>
-          <div className="absolute top-3 right-3 z-20">
-            <AvatarStore />
-          </div>
+        <section className="kid-card p-6 pt-10 relative overflow-visible">
+          <div className="absolute -top-4 -right-3 text-4xl kid-sparkle pointer-events-none">✨</div>
           <div className="flex items-center gap-4">
             <AvatarVisual size="xl" />
             <div className="flex-1">

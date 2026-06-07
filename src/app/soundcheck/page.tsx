@@ -52,6 +52,11 @@ export default function SoundcheckPage() {
 
   const problemStartRef = useRef(Date.now());
   const finalizedRef = useRef(false);
+  // Tally refs — avoid stale closures inside setIdx callback
+  const correctRef = useRef(0);
+  const incorrectRef = useRef(0);
+  const totalMsRef = useRef(0);
+  const godRef = useRef(0);
 
   useEffect(() => {
     setAvailable(isSoundcheckAvailable());
@@ -69,6 +74,10 @@ export default function SoundcheckPage() {
     setPerQTimeLeft(PER_QUESTION_SEC);
     finalizedRef.current = false;
     problemStartRef.current = Date.now();
+    correctRef.current = 0;
+    incorrectRef.current = 0;
+    totalMsRef.current = 0;
+    godRef.current = 0;
   };
 
   const currentProblem = problems[idx];
@@ -82,6 +91,8 @@ export default function SoundcheckPage() {
       const elapsedMs = PER_QUESTION_SEC * 1000;
       const m = currentProblem?.question.match(/(\d+)\s*[+\-×÷]\s*(\d+)/);
       if (m && currentProblem) recordFact('soundcheck', parseInt(m[1]), parseInt(m[2]), false, elapsedMs);
+      incorrectRef.current += 1;
+      totalMsRef.current += elapsedMs;
       setIncorrect((i) => i + 1);
       setTotalMs((t) => t + elapsedMs);
       setFeedback('incorrect');
@@ -121,23 +132,8 @@ export default function SoundcheckPage() {
     setIdx((i) => {
       const next = i + 1;
       if (next >= QUESTION_COUNT) {
-        // Defer to next tick so latest state is read
-        setTimeout(() => {
-          // Read latest via closure refs — using state at time of call
-          setCorrect((c) => {
-            setIncorrect((inc) => {
-              setTotalMs((tm) => {
-                setGodCount((g) => {
-                  finish(c, tm, g);
-                  return g;
-                });
-                return tm;
-              });
-              return inc;
-            });
-            return c;
-          });
-        }, 50);
+        // Read latest tallies from refs — closure-safe
+        setTimeout(() => finish(correctRef.current, totalMsRef.current, godRef.current), 50);
         return i;
       }
       setUserAnswer('');
@@ -157,8 +153,13 @@ export default function SoundcheckPage() {
       const rating = rateSpeed(elapsedMs);
       setSpeedRating(rating);
       recordSpeed(rating);
-      if (rating.tier === 'god') setGodCount((g) => g + 1);
+      if (rating.tier === 'god') {
+        godRef.current += 1;
+        setGodCount((g) => g + 1);
+      }
       setTimeout(() => setSpeedRating(null), 800);
+      correctRef.current += 1;
+      totalMsRef.current += elapsedMs;
       setCorrect((c) => c + 1);
       setTotalMs((t) => t + elapsedMs);
       setFeedback('correct');
@@ -166,6 +167,8 @@ export default function SoundcheckPage() {
       setTimeout(() => setFeedback(null), 300);
       advance();
     } else {
+      incorrectRef.current += 1;
+      totalMsRef.current += elapsedMs;
       setIncorrect((i) => i + 1);
       setTotalMs((t) => t + elapsedMs);
       setFeedback('incorrect');
@@ -189,7 +192,6 @@ export default function SoundcheckPage() {
     return () => window.removeEventListener('keydown', onKey);
   }, [status, handleInput, handleDelete, handleSubmit]);
 
-  const accuracy = QUESTION_COUNT > 0 ? Math.round((correct / Math.max(idx + (status === 'done' ? 0 : 0), 1)) * 100) : 0;
   const today = getTodaySoundcheck();
   const timeLow = perQTimeLeft <= 2;
 

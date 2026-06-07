@@ -88,17 +88,8 @@ function WorldSection({
   const earnedStars = world.stages.reduce((sum, s) => sum + (progress[s.id]?.stars ?? 0), 0);
   const totalStars = world.stages.length * 3;
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="space-y-3"
-    >
-      <motion.div
-        whileInView={{ scale: [0.94, 1] }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.45, ease: 'backOut' }}
+    <section className="space-y-3">
+      <div
         className="rounded-3xl p-4 border-4 border-white flex items-center justify-between"
         style={{ background: `linear-gradient(135deg, ${world.bgFrom}, ${world.bgTo})` }}
       >
@@ -113,7 +104,7 @@ function WorldSection({
           <Star className="w-4 h-4 fill-[#ffd23f] text-[#ffd23f]" />
           <span className="font-display text-sm text-[#2b1d57]">{earnedStars}/{totalStars}</span>
         </div>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 gap-3 px-1">
         {world.stages.map((stage, idx) => {
@@ -124,10 +115,6 @@ function WorldSection({
           return (
             <motion.button
               key={stage.id}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ delay: idx * 0.05, duration: 0.3 }}
               whileTap={unlocked ? { scale: 0.97 } : {}}
               onClick={() => unlocked && onPick(stage)}
               disabled={!unlocked}
@@ -177,6 +164,6 @@ function WorldSection({
           );
         })}
       </div>
-    </motion.section>
+    </section>
   );
 }

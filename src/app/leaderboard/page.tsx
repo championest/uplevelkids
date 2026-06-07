@@ -77,7 +77,7 @@ export default function LeaderboardPage() {
   const rest = combined.slice(3);
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 pt-6 pb-32">
+    <main className="min-h-screen flex flex-col items-center px-4 pt-6 pb-40">
       <div className="w-full max-w-[520px] relative z-10 space-y-5">
         <header className="flex justify-between items-center">
           <Link href="/" className="kid-btn bg-white px-4 py-3 text-[#9b6dff]">
