@@ -29,13 +29,21 @@ export interface StatusTier {
   maxSec: number;
 }
 
+// 12-tier ladder matching TTRS Rock Status thresholds (avg seconds/question).
+// Top → bottom. Names are Thai-rocker hybrid for kid resonance.
 export const STATUS_TIERS: StatusTier[] = [
-  { id: 'god',      name: 'เทพคิดเลข',      emoji: '⚡', color: '#ffd23f', maxSec: 2 },
-  { id: 'rocklegend', name: 'ร็อคเลเจนด์',  emoji: '👑', color: '#ff6fb5', maxSec: 3 },
-  { id: 'rockstar', name: 'ร็อคสตาร์',      emoji: '🌟', color: '#9b6dff', maxSec: 4 },
-  { id: 'headliner', name: 'เฮดไลเนอร์',    emoji: '🎤', color: '#4cc9ff', maxSec: 5 },
-  { id: 'support',  name: 'มือกลอง',        emoji: '🥁', color: '#5ddc7e', maxSec: 7 },
-  { id: 'newbie',   name: 'น้องใหม่ลองดู',  emoji: '🐣', color: '#ff9a3c', maxSec: Infinity },
+  { id: 'rockhero',   name: 'ร็อคฮีโร่',     emoji: '🔥', color: '#ff3b6b', maxSec: 1 },
+  { id: 'rocklegend', name: 'ร็อคเลเจนด์',   emoji: '👑', color: '#ffd23f', maxSec: 2 },
+  { id: 'rockstar',   name: 'ร็อคสตาร์',     emoji: '🌟', color: '#ff6fb5', maxSec: 3 },
+  { id: 'headliner',  name: 'เฮดไลเนอร์',    emoji: '🎤', color: '#9b6dff', maxSec: 4 },
+  { id: 'support',    name: 'นักร้องเปิด',    emoji: '🎸', color: '#4cc9ff', maxSec: 5 },
+  { id: 'breakout',   name: 'หน้าใหม่มาแรง', emoji: '✨', color: '#5ddc7e', maxSec: 6 },
+  { id: 'unsigned',   name: 'ศิลปินอินดี้',   emoji: '🎶', color: '#7cd1ff', maxSec: 7 },
+  { id: 'gigger',     name: 'มือไมโครโฟน',   emoji: '🪩', color: '#ff9a3c', maxSec: 8 },
+  { id: 'busker',     name: 'มือกีตาร์ข้างถนน', emoji: '🎵', color: '#ffb37a', maxSec: 9 },
+  { id: 'garage',     name: 'วงโรงรถ',       emoji: '🥁', color: '#caf7d6', maxSec: 10 },
+  { id: 'wannabe',    name: 'มือใหม่หัดเล่น', emoji: '🎹', color: '#d5c9ff', maxSec: 20 },
+  { id: 'newbie',     name: 'น้องใหม่ลองดู', emoji: '🐣', color: '#ffd6f5', maxSec: Infinity },
 ];
 
 export function statusForAvgSec(avgSec: number): StatusTier {

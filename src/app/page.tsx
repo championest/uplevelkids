@@ -2,24 +2,16 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Play, Trophy, Dumbbell, Swords, Coins, Sparkles, CheckCircle2, Mic2, Wrench } from "lucide-react";
+import { Coins, Sparkles, CheckCircle2, Trophy } from "lucide-react";
 import { statusForAvgSec, avgSecondsFromSession } from "@/lib/speed";
 import { useGame } from "@/lib/GameContext";
 import { ACHIEVEMENTS, getXpInCurrentLevel, XP_PER_LEVEL } from "@/lib/rpg";
+import { MODES } from "@/lib/modes";
 import { cn } from "@/lib/utils";
 import { useLeaderboardSync } from "@/lib/useLeaderboardSync";
 import AvatarVisual from "@/components/AvatarVisual";
 import AvatarStore from "@/components/AvatarStore";
 import DailyBonus from "@/components/DailyBonus";
-
-const MENU = [
-  { id: 'play', label: 'ผจญภัย', sub: 'Adventure', icon: Play, href: '/play', from: '#ff9a3c', to: '#ff5a6a' },
-  { id: 'soundcheck', label: 'เช็คฝีมือ', sub: 'Soundcheck', icon: Mic2, href: '/soundcheck', from: '#ff6fb5', to: '#9b6dff' },
-  { id: 'garage', label: 'โรงรถ', sub: 'Garage', icon: Wrench, href: '/garage', from: '#9b6dff', to: '#4cc9ff' },
-  { id: 'practice', label: 'ฝึกฝีมือ', sub: 'Practice', icon: Dumbbell, href: '/practice', from: '#4cc9ff', to: '#5ddc7e' },
-  { id: 'lobby', label: 'ดวลเพื่อน', sub: 'Battle Online', icon: Swords, href: '/lobby', from: '#5ddc7e', to: '#4cc9ff' },
-  { id: 'leaderboard', label: 'ตารางเทพ', sub: 'Rankings', icon: Trophy, href: '/leaderboard', from: '#ffd23f', to: '#ff9a3c' },
-];
 
 // Friendlier achievement labels (Thai + English) overlaid on existing IDs
 const ACH_LABEL: Record<string, { th: string; en: string }> = {
@@ -123,23 +115,39 @@ export default function Home() {
 
         {/* Big colorful menu buttons */}
         <nav className="grid grid-cols-2 gap-3">
-          {MENU.map((item) => (
-            <Link key={item.id} href={item.href} className="block">
+          {MODES.map((m) => (
+            <Link key={m.id} href={m.href} className="block">
               <motion.div
                 whileTap={{ scale: 0.94 }}
-                className="kid-btn w-full aspect-[1.2] flex-col text-white relative overflow-hidden"
-                style={{
-                  background: `linear-gradient(160deg, ${item.from}, ${item.to})`,
-                }}
+                className="kid-btn w-full aspect-[1.2] flex-col text-white relative overflow-hidden p-2"
+                style={{ background: `linear-gradient(160deg, ${m.bgFrom}, ${m.bgTo})` }}
               >
                 <div className="absolute top-2 right-2 text-white/40 text-xl kid-sparkle">✦</div>
-                <item.icon className="w-10 h-10 drop-shadow-lg" strokeWidth={2.5} />
-                <span className="font-display text-lg mt-1 leading-none">{item.label}</span>
-                <span className="text-[9px] uppercase tracking-wider opacity-80">{item.sub}</span>
+                <span className="text-3xl leading-none mt-1 drop-shadow-lg">{m.emoji}</span>
+                <span className="font-display text-base mt-1 leading-none">{m.th}</span>
+                <span className="text-[9px] uppercase tracking-wider opacity-80">{m.en}</span>
+                <span className="text-[9px] opacity-80 leading-tight px-1 mt-0.5 text-center">{m.desc}</span>
               </motion.div>
             </Link>
           ))}
+          <Link href="/leaderboard" className="block col-span-2">
+            <motion.div
+              whileTap={{ scale: 0.96 }}
+              className="kid-btn w-full py-4 flex-row text-white gap-3"
+              style={{ background: 'linear-gradient(160deg, #ffd23f, #ff9a3c)' }}
+            >
+              <Trophy className="w-7 h-7 drop-shadow-lg" />
+              <span className="font-display text-xl">ตารางเทพ · Rankings</span>
+            </motion.div>
+          </Link>
         </nav>
+
+        {/* Trust signals (parents) */}
+        <section className="kid-card p-3 grid grid-cols-3 gap-2 text-center text-[10px] font-bold text-[#2b1d57]/70">
+          <div className="space-y-1"><div className="text-xl">🛡️</div>ไม่บังคับซื้อ</div>
+          <div className="space-y-1"><div className="text-xl">🚫</div>ไม่มีโฆษณา</div>
+          <div className="space-y-1"><div className="text-xl">🔒</div>ไม่มีแชท</div>
+        </section>
 
         {/* Achievements / Badges */}
         <section className="space-y-3">

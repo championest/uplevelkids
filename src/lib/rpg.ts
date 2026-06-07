@@ -1,22 +1,122 @@
 import type { Operation, DifficultyLevel } from './math';
 
+export type ItemSlot =
+  | 'hat'
+  | 'face'
+  | 'top'
+  | 'instrument'
+  | 'accessory'
+  | 'aura'
+  | 'pet'
+  | 'frame';
+
+export type ItemRarity = 'common' | 'rare' | 'legendary';
+
 export interface Item {
   id: string;
   name: string;
   price: number;
-  category: 'hat' | 'aura' | 'pet';
+  category: ItemSlot;
   image: string;
+  rarity?: ItemRarity;
 }
 
-// Kid-friendly shop items — bright, playful names
+// 50+ items across 8 slots — all earnable in coins (no IAP gating, TTRS-style).
+// Prices: common 30-150, rare 200-500, legendary 800-2000.
 export const SHOP_ITEMS: Item[] = [
-  { id: 'hat_1', name: 'หมวกนักเรียน', price: 50, category: 'hat', image: '🎓' },
-  { id: 'hat_2', name: 'มงกุฎทอง', price: 250, category: 'hat', image: '👑' },
-  { id: 'aura_1', name: 'แสงรุ้ง', price: 150, category: 'aura', image: '🌈' },
-  { id: 'aura_2', name: 'พายุดาว', price: 400, category: 'aura', image: '✨' },
-  { id: 'pet_1', name: 'หมาน้อย', price: 300, category: 'pet', image: '🐶' },
-  { id: 'pet_2', name: 'แมวอวกาศ', price: 500, category: 'pet', image: '🐱' },
+  // --- HAT (10) ---
+  { id: 'hat_grad',     name: 'หมวกนักเรียน',   price: 60,  category: 'hat', image: '🎓', rarity: 'common' },
+  { id: 'hat_party',    name: 'หมวกปาร์ตี้',     price: 80,  category: 'hat', image: '🎩', rarity: 'common' },
+  { id: 'hat_cowboy',   name: 'หมวกคาวบอย',    price: 120, category: 'hat', image: '🤠', rarity: 'common' },
+  { id: 'hat_cap',      name: 'หมวกแก๊ป',       price: 90,  category: 'hat', image: '🧢', rarity: 'common' },
+  { id: 'hat_helmet',   name: 'หมวกขับขี่',     price: 100, category: 'hat', image: '⛑️', rarity: 'common' },
+  { id: 'hat_crown',    name: 'มงกุฎทอง',       price: 600, category: 'hat', image: '👑', rarity: 'rare' },
+  { id: 'hat_chef',     name: 'หมวกเชฟ',        price: 200, category: 'hat', image: '👨‍🍳', rarity: 'rare' },
+  { id: 'hat_magic',    name: 'หมวกพ่อมด',      price: 400, category: 'hat', image: '🧙', rarity: 'rare' },
+  { id: 'hat_unicorn',  name: 'มงกุฎยูนิคอร์น', price: 1200, category: 'hat', image: '🦄', rarity: 'legendary' },
+  { id: 'hat_halo',     name: 'แสงทิพย์',        price: 1800, category: 'hat', image: '😇', rarity: 'legendary' },
+
+  // --- FACE / EXPRESSION (8) ---
+  { id: 'face_smile',   name: 'ยิ้มร่า',         price: 30,  category: 'face', image: '😄', rarity: 'common' },
+  { id: 'face_cool',    name: 'แว่นเท่',         price: 100, category: 'face', image: '😎', rarity: 'common' },
+  { id: 'face_starry',  name: 'ตาดาว',          price: 200, category: 'face', image: '🤩', rarity: 'common' },
+  { id: 'face_glasses', name: 'แว่นนักอ่าน',     price: 80,  category: 'face', image: '🤓', rarity: 'common' },
+  { id: 'face_mask',    name: 'หน้ากากปาร์ตี้',  price: 220, category: 'face', image: '🥸', rarity: 'rare' },
+  { id: 'face_ninja',   name: 'นินจาเงียบ',      price: 350, category: 'face', image: '🥷', rarity: 'rare' },
+  { id: 'face_devil',   name: 'แกล้งซน',         price: 500, category: 'face', image: '😈', rarity: 'rare' },
+  { id: 'face_robot',   name: 'หน้าหุ่นยนต์',    price: 1500, category: 'face', image: '🤖', rarity: 'legendary' },
+
+  // --- TOP / OUTFIT (7) ---
+  { id: 'top_shirt',    name: 'เสื้อยืด',        price: 50,  category: 'top', image: '👕', rarity: 'common' },
+  { id: 'top_tie',      name: 'เนคไท',          price: 120, category: 'top', image: '👔', rarity: 'common' },
+  { id: 'top_jacket',   name: 'แจ็คเก็ตหนัง',   price: 300, category: 'top', image: '🧥', rarity: 'rare' },
+  { id: 'top_kimono',   name: 'กิโมโน',         price: 350, category: 'top', image: '👘', rarity: 'rare' },
+  { id: 'top_dress',    name: 'ชุดเดรส',        price: 280, category: 'top', image: '👗', rarity: 'rare' },
+  { id: 'top_lab',      name: 'เสื้อแล็บ',      price: 420, category: 'top', image: '🥼', rarity: 'rare' },
+  { id: 'top_king',     name: 'ชุดราชวงศ์',     price: 1500, category: 'top', image: '🤴', rarity: 'legendary' },
+
+  // --- INSTRUMENT (8) ---
+  { id: 'ins_guitar',   name: 'กีตาร์',          price: 80,  category: 'instrument', image: '🎸', rarity: 'common' },
+  { id: 'ins_keys',     name: 'คีย์บอร์ด',       price: 100, category: 'instrument', image: '🎹', rarity: 'common' },
+  { id: 'ins_drum',     name: 'กลอง',            price: 100, category: 'instrument', image: '🥁', rarity: 'common' },
+  { id: 'ins_mic',      name: 'ไมค์เสียง',       price: 120, category: 'instrument', image: '🎤', rarity: 'common' },
+  { id: 'ins_violin',   name: 'ไวโอลิน',        price: 250, category: 'instrument', image: '🎻', rarity: 'rare' },
+  { id: 'ins_sax',      name: 'แซ็กโซโฟน',      price: 280, category: 'instrument', image: '🎷', rarity: 'rare' },
+  { id: 'ins_trumpet',  name: 'ทรัมเป็ต',       price: 240, category: 'instrument', image: '🎺', rarity: 'rare' },
+  { id: 'ins_dj',       name: 'เครื่องดีเจ',     price: 1200, category: 'instrument', image: '🎛️', rarity: 'legendary' },
+
+  // --- ACCESSORY (7) ---
+  { id: 'acc_ribbon',   name: 'โบว์ผูกผม',      price: 40,  category: 'accessory', image: '🎀', rarity: 'common' },
+  { id: 'acc_balloon',  name: 'ลูกโป่ง',        price: 60,  category: 'accessory', image: '🎈', rarity: 'common' },
+  { id: 'acc_star',     name: 'ดาวประดับ',      price: 90,  category: 'accessory', image: '⭐', rarity: 'common' },
+  { id: 'acc_medal',    name: 'เหรียญรางวัล',   price: 200, category: 'accessory', image: '🏅', rarity: 'rare' },
+  { id: 'acc_trophy',   name: 'ถ้วยเล็ก',       price: 400, category: 'accessory', image: '🏆', rarity: 'rare' },
+  { id: 'acc_wings',    name: 'ปีกนางฟ้า',      price: 700, category: 'accessory', image: '🪽', rarity: 'rare' },
+  { id: 'acc_rocket',   name: 'เป้จรวด',        price: 1600, category: 'accessory', image: '🚀', rarity: 'legendary' },
+
+  // --- AURA (7) ---
+  { id: 'aura_rainbow', name: 'แสงรุ้ง',        price: 150, category: 'aura', image: '🌈', rarity: 'common' },
+  { id: 'aura_sparkle', name: 'พายุดาว',        price: 300, category: 'aura', image: '✨', rarity: 'common' },
+  { id: 'aura_fire',    name: 'เปลวไฟ',        price: 400, category: 'aura', image: '🔥', rarity: 'rare' },
+  { id: 'aura_ice',     name: 'หิมะคริสตัล',   price: 400, category: 'aura', image: '❄️', rarity: 'rare' },
+  { id: 'aura_storm',   name: 'พายุฟ้าผ่า',    price: 600, category: 'aura', image: '⚡', rarity: 'rare' },
+  { id: 'aura_galaxy',  name: 'จักรวาล',       price: 1400, category: 'aura', image: '🌌', rarity: 'legendary' },
+  { id: 'aura_blossom', name: 'ดอกซากุระ',     price: 900, category: 'aura', image: '🌸', rarity: 'rare' },
+
+  // --- PET (8) ---
+  { id: 'pet_dog',      name: 'หมาน้อย',        price: 250, category: 'pet', image: '🐶', rarity: 'common' },
+  { id: 'pet_cat',      name: 'แมวเหมียว',      price: 250, category: 'pet', image: '🐱', rarity: 'common' },
+  { id: 'pet_bunny',    name: 'กระต่ายฟู',      price: 280, category: 'pet', image: '🐰', rarity: 'common' },
+  { id: 'pet_fox',      name: 'จิ้งจอก',         price: 350, category: 'pet', image: '🦊', rarity: 'rare' },
+  { id: 'pet_panda',    name: 'หมีแพนด้า',      price: 400, category: 'pet', image: '🐼', rarity: 'rare' },
+  { id: 'pet_dragon',   name: 'มังกรน้อย',       price: 1200, category: 'pet', image: '🐉', rarity: 'legendary' },
+  { id: 'pet_unicorn',  name: 'ยูนิคอร์น',       price: 1800, category: 'pet', image: '🦄', rarity: 'legendary' },
+  { id: 'pet_dino',     name: 'ไดโนเสาร์',       price: 600, category: 'pet', image: '🦕', rarity: 'rare' },
+
+  // --- FRAME (profile frame, 5) ---
+  { id: 'frame_basic',  name: 'กรอบมาตรฐาน',    price: 100, category: 'frame', image: '🟡', rarity: 'common' },
+  { id: 'frame_silver', name: 'กรอบเงิน',       price: 300, category: 'frame', image: '⚪', rarity: 'rare' },
+  { id: 'frame_gold',   name: 'กรอบทอง',        price: 600, category: 'frame', image: '🟠', rarity: 'rare' },
+  { id: 'frame_diamond', name: 'กรอบเพชร',     price: 1500, category: 'frame', image: '💎', rarity: 'legendary' },
+  { id: 'frame_neon',   name: 'กรอบนีออน',      price: 800, category: 'frame', image: '🟣', rarity: 'rare' },
 ];
+
+export const SLOT_LABEL: Record<ItemSlot, { th: string; emoji: string }> = {
+  hat: { th: 'หมวก', emoji: '🎩' },
+  face: { th: 'ใบหน้า', emoji: '😎' },
+  top: { th: 'เสื้อ', emoji: '👕' },
+  instrument: { th: 'เครื่องดนตรี', emoji: '🎸' },
+  accessory: { th: 'ของประดับ', emoji: '🎀' },
+  aura: { th: 'ออร่า', emoji: '✨' },
+  pet: { th: 'สัตว์เลี้ยง', emoji: '🐾' },
+  frame: { th: 'กรอบ', emoji: '🖼️' },
+};
+
+export const RARITY_META: Record<ItemRarity, { th: string; color: string; bg: string }> = {
+  common:    { th: 'ทั่วไป',     color: '#5ddc7e', bg: '#caf7d6' },
+  rare:      { th: 'หายาก',      color: '#9b6dff', bg: '#d5c9ff' },
+  legendary: { th: 'ตำนาน',      color: '#ff9a3c', bg: '#ffd6a8' },
+};
 
 export interface Achievement {
   id: string;
@@ -160,6 +260,10 @@ export interface StageResult {
   bestCorrect: number;
 }
 
+export type EquippedSlots = {
+  [K in ItemSlot]: string | null;
+};
+
 export interface UserState {
   coins: number;
   xp: number;
@@ -167,13 +271,13 @@ export interface UserState {
   totalSolved: number;
   inventory: string[];
   achievements: string[];
-  equipped: {
-    hat: string | null;
-    aura: string | null;
-    pet: string | null;
-  };
+  equipped: EquippedSlots;
   /** Stage progress: stageId → best stars (0-3) + best correct */
   stageProgress: Record<string, StageResult>;
+  /** Active premium pass id, null if free */
+  premiumPassId: string | null;
+  /** Premium expiry timestamp (ms), 0 if none */
+  premiumExpiresAt: number;
 }
 
 export const INITIAL_STATE: UserState = {
@@ -183,8 +287,19 @@ export const INITIAL_STATE: UserState = {
   totalSolved: 0,
   inventory: [],
   achievements: [],
-  equipped: { hat: null, aura: null, pet: null },
+  equipped: {
+    hat: null,
+    face: null,
+    top: null,
+    instrument: null,
+    accessory: null,
+    aura: null,
+    pet: null,
+    frame: null,
+  },
   stageProgress: {},
+  premiumPassId: null,
+  premiumExpiresAt: 0,
 };
 
 export const XP_PER_LEVEL = 500;

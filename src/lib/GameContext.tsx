@@ -11,11 +11,17 @@ import {
   ACHIEVEMENTS,
   StageResult,
 } from '@/lib/rpg';
+import { GameMode, modeReward } from '@/lib/modes';
 import { useSession } from 'next-auth/react';
 
 interface GameContextType {
   state: UserState;
+  /** Legacy: defaults to "practice" rate (4 coins + 6 XP per correct). */
   addRewards: (correctAnswers: number) => void;
+  /** TTRS-style mode-specific reward */
+  addModeRewards: (mode: GameMode, correctAnswers: number) => void;
+  /** Add raw coins (e.g. from coin packs, daily bonus, stage clear reward). */
+  addCoins: (amount: number) => void;
   buyItem: (itemId: string) => boolean;
   equipItem: (itemId: string) => void;
   checkAchievements: () => void;
@@ -46,6 +52,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           achievements: parsed.achievements || [],
           totalSolved: parsed.totalSolved || 0,
           stageProgress: parsed.stageProgress || {},
+          // Migrate equipped from old 3-slot shape to 8-slot
+          equipped: { ...INITIAL_STATE.equipped, ...(parsed.equipped || {}) },
+          premiumPassId: parsed.premiumPassId ?? null,
+          premiumExpiresAt: parsed.premiumExpiresAt ?? 0,
         });
       } catch {
         setState(INITIAL_STATE);
@@ -86,15 +96,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const addRewards = (correctAnswers: number) => {
+  const applyRewards = (correct: number, coinsRate: number, xpRate: number) => {
     setState((prev) => {
-      const newXp = prev.xp + correctAnswers * XP_PER_CORRECT;
-      const newCoins = prev.coins + correctAnswers * COINS_PER_CORRECT;
+      const newXp = prev.xp + correct * xpRate;
+      const newCoins = prev.coins + correct * coinsRate;
       const newLevel = calculateLevel(newXp);
-      const newTotalSolved = (prev.totalSolved || 0) + correctAnswers;
+      const newTotalSolved = (prev.totalSolved || 0) + correct;
       const newAchievements = [...prev.achievements];
       let bonusCoins = 0;
-      if (correctAnswers >= 10 && !newAchievements.includes('speed_demon')) {
+      if (correct >= 10 && !newAchievements.includes('speed_demon')) {
         newAchievements.push('speed_demon');
         const ach = ACHIEVEMENTS.find((a) => a.id === 'speed_demon');
         bonusCoins = ach?.reward || 0;
@@ -109,6 +119,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
       };
     });
     setTimeout(checkAchievements, 100);
+  };
+
+  const addRewards = (correctAnswers: number) =>
+    applyRewards(correctAnswers, COINS_PER_CORRECT, XP_PER_CORRECT);
+
+  const addModeRewards = (mode: GameMode, correctAnswers: number) => {
+    const { coins, xp } = modeReward(mode, correctAnswers);
+    if (correctAnswers === 0) return;
+    applyRewards(correctAnswers, coins / correctAnswers, xp / correctAnswers);
+  };
+
+  const addCoins = (amount: number) => {
+    if (amount === 0) return;
+    setState((prev) => ({ ...prev, coins: prev.coins + amount }));
   };
 
   const buyItem = (itemId: string) => {
@@ -161,7 +185,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   return (
     <GameContext.Provider
-      value={{ state, addRewards, buyItem, equipItem, checkAchievements, completeStage }}
+      value={{ state, addRewards, addModeRewards, addCoins, buyItem, equipItem, checkAchievements, completeStage }}
     >
       {isLoaded ? (
         children
