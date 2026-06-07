@@ -1,26 +1,112 @@
 @import "tailwindcss";
+@import "@fontsource/plus-jakarta-sans/400.css";
+@import "@fontsource/plus-jakarta-sans/700.css";
+@import "@fontsource/plus-jakarta-sans/800.css";
+
+/* Kid theme — bright candy pastel. Fredoka + Baloo loaded via next/font in layout.tsx */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --kid-sky-1: #a5e8ff;
+  --kid-sky-2: #ffd6f5;
+  --kid-sky-3: #fff4b8;
+  --kid-pink: #ff6fb5;
+  --kid-purple: #9b6dff;
+  --kid-blue: #4cc9ff;
+  --kid-yellow: #ffd23f;
+  --kid-green: #5ddc7e;
+  --kid-orange: #ff9a3c;
+  --kid-red: #ff5a6a;
+  --kid-cream: #fff8ec;
+  --kid-deep: #2b1d57;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  background:
+    radial-gradient(circle at 20% 10%, var(--kid-sky-2) 0%, transparent 45%),
+    radial-gradient(circle at 80% 0%, var(--kid-sky-3) 0%, transparent 40%),
+    linear-gradient(180deg, var(--kid-sky-1) 0%, #d5c9ff 55%, #ffd6f5 100%);
+  background-attachment: fixed;
+  color: var(--kid-deep);
+  /* Mitr renders Thai beautifully (round, kid-friendly). Fredoka covers Latin fallback. */
+  font-family: var(--font-mitr), var(--font-fredoka), 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.font-display {
+  /* Display headings — Mitr 700 for Thai, Baloo for Latin */
+  font-family: var(--font-mitr), var(--font-baloo), var(--font-fredoka), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.005em;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Big chunky kid button base — used via @apply alternative (Tailwind v4 no @apply by default) */
+.kid-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 28px;
+  font-weight: 700;
+  font-family: var(--font-mitr), var(--font-baloo), sans-serif;
+  border: 4px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.12), 0 12px 24px rgba(43, 29, 87, 0.18);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
+.kid-btn:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), 0 4px 10px rgba(43, 29, 87, 0.18);
+}
+
+.kid-card {
+  background: var(--kid-cream);
+  border-radius: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 0 rgba(155, 109, 255, 0.18), 0 18px 40px rgba(43, 29, 87, 0.12);
+}
+
+/* Animations */
+@keyframes kid-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.kid-pop { animation: kid-pop 0.35s cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+
+@keyframes kid-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.kid-bounce { animation: kid-bounce 1.6s ease-in-out infinite; }
+
+@keyframes kid-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+.kid-wiggle { animation: kid-wiggle 0.5s ease-in-out 2; }
+
+@keyframes kid-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+.kid-shake { animation: kid-shake 0.18s ease-in-out 3; }
+
+@keyframes kid-float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(8px, -6px) rotate(4deg); }
+  66% { transform: translate(-6px, -10px) rotate(-3deg); }
+}
+.kid-float { animation: kid-float 6s ease-in-out infinite; }
+
+@keyframes kid-sparkle {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.kid-sparkle { animation: kid-sparkle 2s ease-in-out infinite; }
+
+/* Big body text scale — kids read better with bigger fonts */
+body { font-size: 17px; }

@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef, use } from 'react';
+import { useEffect, useState, useCallback, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { onSnapshot } from 'firebase/firestore';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronLeft, Copy, Check, Users, Swords, Crown, Loader2, Timer, Flame, Trophy } from 'lucide-react';
 import { usePlayer } from '@/lib/usePlayer';
 import {
@@ -19,6 +19,9 @@ import {
 } from '@/lib/rooms';
 import { cn } from '@/lib/utils';
 import Numpad from '@/components/Numpad';
+import Mascot, { MascotMood } from '@/components/Mascot';
+import Confetti from '@/components/Confetti';
+import { playCorrect, playWrong, playStreak, playLevelUp } from '@/lib/sounds';
 
 const formatTime = (sec: number) => {
   const m = Math.floor(sec / 60);
@@ -36,7 +39,6 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
-  // local play state
   const [problemIdx, setProblemIdx] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
   const [correct, setCorrect] = useState(0);
@@ -46,15 +48,16 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [mood, setMood] = useState<MascotMood>('happy');
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
 
-  // Subscribe to room
   useEffect(() => {
     if (!playerId) return;
     const unsub = onSnapshot(
       roomDoc(code),
       (snap) => {
         if (!snap.exists()) {
-          setError('ห้องไม่พบ');
+          setError('ไม่เจอห้องนี้');
           setLoading(false);
           return;
         }
@@ -76,14 +79,12 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const me = players.find(([id]) => id === playerId);
   const allReady = players.length === 2 && players.every(([, p]) => p.ready);
 
-  // Init timer when status flips to playing
   useEffect(() => {
     if (room?.status === 'playing' && timeLeft === 0 && !finished) {
       setTimeLeft(room.settings.durationSec);
     }
   }, [room?.status, room?.settings.durationSec, timeLeft, finished]);
 
-  // Countdown
   useEffect(() => {
     if (room?.status !== 'playing' || finished) return;
     if (timeLeft <= 0) {
@@ -95,7 +96,6 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     return () => clearInterval(t);
   }, [room?.status, timeLeft, finished, code, playerId]);
 
-  // Detect both finished → mark room finished (host writes)
   useEffect(() => {
     if (!room || !isHost) return;
     if (room.status !== 'playing') return;
@@ -105,7 +105,6 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     }
   }, [room, isHost, code]);
 
-  // Push progress to firestore on change (throttle: only on correct/incorrect change)
   const progressKey = `${correct}-${incorrect}-${bestStreak}`;
   useEffect(() => {
     if (!inRoom || room?.status !== 'playing' || finished) return;
@@ -123,8 +122,19 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       setStreak((s) => {
         const n = s + 1;
         setBestStreak((b) => Math.max(b, n));
+        if (n >= 3 && n % 5 === 0) {
+          setConfettiTrigger((t) => t + 1);
+          playLevelUp();
+          setMood('cheer');
+          setTimeout(() => setMood('happy'), 1000);
+        } else {
+          playStreak(n);
+          setMood('cheer');
+          setTimeout(() => setMood('happy'), 400);
+        }
         return n;
       });
+      playCorrect();
       setFeedback('correct');
       setUserAnswer('');
       setProblemIdx((i) => {
@@ -139,8 +149,11 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       setIncorrect((i) => i + 1);
       setStreak(0);
       setFeedback('incorrect');
+      playWrong();
+      setMood('sad');
+      setTimeout(() => setMood('think'), 500);
     }
-    setTimeout(() => setFeedback(null), 400);
+    setTimeout(() => setFeedback(null), 350);
   }, [currentProblem, userAnswer, finished, room, code, playerId]);
 
   const handleInput = useCallback((v: string) => {
@@ -148,7 +161,6 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   }, []);
   const handleDelete = useCallback(() => setUserAnswer((p) => p.slice(0, -1)), []);
 
-  // keyboard
   useEffect(() => {
     if (room?.status !== 'playing' || finished) return;
     const onKey = (e: KeyboardEvent) => {
@@ -173,58 +185,57 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#020617] flex items-center justify-center text-white">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+      <main className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-[#9b6dff]" />
       </main>
     );
   }
 
   if (error || !room) {
     return (
-      <main className="min-h-screen bg-[#020617] flex flex-col items-center justify-center text-white p-6 gap-4">
-        <p className="text-lg font-black uppercase italic text-red-400">{error || 'ห้องไม่พบ'}</p>
-        <Link href="/lobby" className="px-6 py-3 bg-white text-slate-950 rounded-2xl font-black uppercase text-sm">Back to Lobby</Link>
+      <main className="min-h-screen flex flex-col items-center justify-center p-6 gap-4">
+        <Mascot mood="sad" size={120} />
+        <p className="font-display text-2xl text-[#2b1d57]">{error || 'ไม่เจอห้องนี้'}</p>
+        <Link href="/lobby" className="kid-btn px-6 py-3 text-white" style={{ background: 'linear-gradient(160deg, #ff6fb5, #9b6dff)' }}>กลับไป Lobby</Link>
       </main>
     );
   }
 
   if (!inRoom) {
     return (
-      <main className="min-h-screen bg-[#020617] flex flex-col items-center justify-center text-white p-6 gap-4">
-        <p className="text-lg font-black uppercase italic">คุณไม่อยู่ในห้องนี้</p>
-        <Link href={`/lobby`} className="px-6 py-3 bg-white text-slate-950 rounded-2xl font-black uppercase text-sm">Go to Lobby</Link>
+      <main className="min-h-screen flex flex-col items-center justify-center p-6 gap-4">
+        <Mascot mood="think" size={120} />
+        <p className="font-display text-2xl text-[#2b1d57]">หนูไม่ได้อยู่ในห้องนี้</p>
+        <Link href="/lobby" className="kid-btn px-6 py-3 text-white" style={{ background: 'linear-gradient(160deg, #4cc9ff, #5ddc7e)' }}>กลับไป Lobby</Link>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-100 font-['Plus_Jakarta_Sans'] p-4">
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(168,85,247,0.08),transparent_80%)]" />
-      </div>
-
-      <div className="w-full max-w-[500px] mx-auto relative z-10 space-y-5 pt-4 pb-12">
+    <main className="min-h-screen flex flex-col items-center px-4 pt-6 pb-12">
+      <Confetti trigger={confettiTrigger} />
+      <div className="w-full max-w-[520px] relative z-10 space-y-4">
         <header className="flex items-center justify-between">
-          <button onClick={handleLeave} className="p-3 bg-slate-900/80 border border-white/10 rounded-2xl text-slate-400 hover:text-white">
+          <button onClick={handleLeave} className="kid-btn bg-white px-4 py-3 text-[#9b6dff]">
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <div className="flex items-center gap-2 bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Room</span>
-            <span className="text-xl font-black text-white tracking-[0.2em]">{code}</span>
-            <button onClick={copyCode} className="ml-1 text-slate-500 hover:text-white">
-              {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+          <div className="flex items-center gap-2 bg-white/90 rounded-full px-4 py-2 border-4 border-white shadow">
+            <span className="text-xs font-bold text-[#2b1d57]/60">รหัส</span>
+            <span className="font-display text-xl text-[#9b6dff] tracking-[0.2em]">{code}</span>
+            <button onClick={copyCode} className="ml-1 text-[#2b1d57]/50 hover:text-[#9b6dff]">
+              {copied ? <Check className="w-4 h-4 text-[#5ddc7e]" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
         </header>
 
         {/* Waiting room */}
         {room.status === 'waiting' && (
-          <div className="space-y-5">
-            <div className="bg-slate-900/50 border border-white/10 rounded-3xl p-6 text-center space-y-3">
-              <Users className="w-12 h-12 text-purple-400 mx-auto" />
-              <h1 className="text-2xl font-black uppercase italic tracking-tighter text-white">Waiting Room</h1>
-              <p className="text-[10px] font-black text-purple-400 uppercase tracking-[0.3em]">
-                {players.length}/2 players · {room.problems.length} problems · {formatTime(room.settings.durationSec)}
+          <div className="space-y-4">
+            <div className="kid-card p-5 text-center">
+              <Users className="w-10 h-10 text-[#9b6dff] mx-auto" />
+              <h1 className="font-display text-2xl text-[#2b1d57] mt-2">ห้องรอ</h1>
+              <p className="text-sm text-[#2b1d57]/60 mt-1">
+                {players.length}/2 คน · {room.problems.length} ข้อ · {formatTime(room.settings.durationSec)}
               </p>
             </div>
 
@@ -239,31 +250,29 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                   <div
                     key={slot}
                     className={cn(
-                      'p-5 rounded-3xl border-2 transition-all min-h-[120px] flex flex-col items-center justify-center text-center',
+                      'rounded-3xl border-4 transition-all min-h-[140px] p-4 flex flex-col items-center justify-center text-center',
                       p
                         ? slotData?.ready
-                          ? 'bg-green-500/10 border-green-500/40'
-                          : 'bg-slate-900/60 border-white/10'
-                        : 'bg-slate-900/30 border-dashed border-white/10'
+                          ? 'bg-[#5ddc7e]/20 border-[#5ddc7e]'
+                          : 'bg-white border-white'
+                        : 'bg-white/40 border-dashed border-white/80'
                     )}
                   >
                     {p ? (
                       <>
-                        <div className="flex items-center gap-2 mb-2">
-                          {isHostSlot && <Crown className="w-4 h-4 text-yellow-400" />}
-                          <p className="text-sm font-black uppercase tracking-tight text-white">{slotData?.name}</p>
-                        </div>
-                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">
-                          {isMe ? 'YOU' : 'OPPONENT'}
+                        {isHostSlot && <Crown className="w-5 h-5 text-[#ffd23f] mb-1" />}
+                        <p className="font-display text-base text-[#2b1d57]">{slotData?.name}</p>
+                        <p className="text-[10px] font-bold text-[#2b1d57]/50 uppercase mt-1">
+                          {isMe ? 'หนู' : 'คู่แข่ง'}
                         </p>
-                        <p className={cn('text-[10px] font-black uppercase tracking-widest', slotData?.ready ? 'text-green-400' : 'text-slate-600')}>
-                          {slotData?.ready ? 'READY ✓' : 'NOT READY'}
+                        <p className={cn('text-xs font-bold uppercase mt-1', slotData?.ready ? 'text-[#5ddc7e]' : 'text-[#2b1d57]/40')}>
+                          {slotData?.ready ? 'พร้อม ✓' : 'ยังไม่พร้อม'}
                         </p>
                       </>
                     ) : (
                       <>
-                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Empty Slot</p>
-                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">รอผู้เล่น...</p>
+                        <p className="text-3xl">⏳</p>
+                        <p className="text-xs font-bold text-[#2b1d57]/40 mt-1">รอเพื่อน...</p>
                       </>
                     )}
                   </div>
@@ -272,38 +281,38 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             </div>
 
             {me && (
-              <button
+              <motion.button
+                whileTap={{ scale: 0.97 }}
                 onClick={() => setReady(code, playerId, !me[1].ready)}
                 className={cn(
-                  'w-full py-4 rounded-2xl text-lg font-black uppercase italic tracking-widest transition-all',
-                  me[1].ready
-                    ? 'bg-slate-800 text-slate-400'
-                    : 'bg-purple-500 text-white shadow-[0_6px_0_rgb(126,34,206)] active:shadow-none active:translate-y-[6px]'
+                  'kid-btn w-full py-4 text-xl font-display',
+                  me[1].ready ? 'bg-white text-[#2b1d57]/60' : 'text-white'
                 )}
+                style={!me[1].ready ? { background: 'linear-gradient(160deg, #5ddc7e, #4cc9ff)' } : undefined}
               >
-                {me[1].ready ? 'CANCEL READY' : 'READY ✓'}
-              </button>
+                {me[1].ready ? 'ยกเลิก' : 'พร้อม ✓'}
+              </motion.button>
             )}
 
             {isHost && (
-              <button
+              <motion.button
+                whileTap={allReady ? { scale: 0.97 } : {}}
                 onClick={() => allReady && startRoom(code)}
                 disabled={!allReady}
                 className={cn(
-                  'w-full py-4 rounded-2xl text-lg font-black uppercase italic tracking-widest transition-all flex items-center justify-center gap-3',
-                  allReady
-                    ? 'bg-white text-slate-950 shadow-[0_6px_0_rgb(226,232,240)] active:shadow-none active:translate-y-[6px]'
-                    : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                  'kid-btn w-full py-4 text-xl font-display gap-3',
+                  allReady ? 'text-white' : 'bg-white/60 text-[#2b1d57]/30 cursor-not-allowed'
                 )}
+                style={allReady ? { background: 'linear-gradient(160deg, #ff6fb5, #ff9a3c)' } : undefined}
               >
-                <Swords className="w-5 h-5" />
-                {allReady ? 'START BATTLE' : players.length < 2 ? 'รอผู้เล่นที่ 2' : 'รอทุกคน Ready'}
-              </button>
+                <Swords className="w-6 h-6" />
+                {allReady ? 'เริ่มดวล!' : players.length < 2 ? 'รอเพื่อน...' : 'รอทุกคนพร้อม'}
+              </motion.button>
             )}
 
-            <div className="text-center">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Share Code</p>
-              <button onClick={copyCode} className="text-4xl font-black text-purple-400 tracking-[0.3em] hover:text-white transition-colors">
+            <div className="text-center kid-card p-4">
+              <p className="text-xs font-bold text-[#2b1d57]/60 mb-1">แชร์รหัสนี้ให้เพื่อน</p>
+              <button onClick={copyCode} className="font-display text-4xl text-[#9b6dff] tracking-[0.3em]">
                 {code}
               </button>
             </div>
@@ -312,8 +321,8 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
         {/* Playing */}
         {room.status === 'playing' && !finished && (
-          <div className="space-y-4">
-            {/* Opponent + my live scoreboard */}
+          <div className="space-y-3">
+            {/* Live scoreboard */}
             <div className="grid grid-cols-2 gap-3">
               {[me, opponent].map((p, idx) => {
                 if (!p) return <div key={idx} />;
@@ -323,78 +332,82 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                   <div
                     key={idx}
                     className={cn(
-                      'p-3 rounded-2xl border-2',
-                      isMe ? 'bg-purple-500/15 border-purple-500/40' : 'bg-cyan-500/10 border-cyan-500/30'
+                      'p-3 rounded-3xl border-4',
+                      isMe ? 'bg-[#9b6dff]/15 border-[#9b6dff]' : 'bg-[#4cc9ff]/15 border-[#4cc9ff]'
                     )}
                   >
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">
-                      {isMe ? 'YOU' : data?.name || 'OPPONENT'}
+                    <p className="text-xs font-bold text-[#2b1d57]/60">
+                      {isMe ? 'หนู' : data?.name || 'คู่แข่ง'}
                     </p>
                     <div className="flex items-baseline gap-2">
-                      <span className={cn('text-2xl font-black tabular-nums', isMe ? 'text-purple-300' : 'text-cyan-300')}>
+                      <span className={cn('font-display text-3xl tabular-nums', isMe ? 'text-[#9b6dff]' : 'text-[#4cc9ff]')}>
                         {data?.correct ?? 0}
                       </span>
-                      <span className="text-[10px] font-black text-slate-500">/ {room.problems.length}</span>
+                      <span className="text-xs text-[#2b1d57]/40">/ {room.problems.length}</span>
                     </div>
-                    {data?.finishedAt && <p className="text-[9px] font-black text-green-400 uppercase mt-1">FINISHED ✓</p>}
+                    {data?.finishedAt && <p className="text-[10px] font-bold text-[#5ddc7e] uppercase mt-1">เสร็จแล้ว ✓</p>}
                   </div>
                 );
               })}
             </div>
 
             {/* Timer + streak */}
-            <div className="flex justify-between items-center bg-slate-900/40 border border-white/10 rounded-2xl px-4 py-3">
+            <div className="flex justify-between items-center bg-white/80 rounded-full px-4 py-2 border-4 border-white">
               <div className="flex items-center gap-2">
-                <Timer className={cn('w-4 h-4', timeLeft < 10 ? 'text-red-400' : 'text-cyan-400')} />
-                <span className={cn('text-lg font-black tabular-nums', timeLeft < 10 ? 'text-red-400' : 'text-white')}>{formatTime(timeLeft)}</span>
+                <Timer className={cn('w-5 h-5', timeLeft < 10 ? 'text-[#ff5a6a]' : 'text-[#4cc9ff]')} />
+                <span className={cn('font-display text-lg tabular-nums', timeLeft < 10 ? 'text-[#ff5a6a] kid-shake' : 'text-[#2b1d57]')}>
+                  {formatTime(timeLeft)}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <Flame className={cn('w-4 h-4', streak > 0 ? 'text-orange-400' : 'text-slate-600')} />
-                <span className={cn('text-lg font-black italic', streak > 0 ? 'text-orange-400' : 'text-slate-600')}>x{streak}</span>
+                <Flame className={cn('w-5 h-5', streak > 0 ? 'text-[#ff9a3c]' : 'text-[#2b1d57]/30')} />
+                <span className={cn('font-display text-lg', streak > 0 ? 'text-[#ff9a3c]' : 'text-[#2b1d57]/40')}>x{streak}</span>
               </div>
             </div>
 
             {/* Problem */}
-            <div className="bg-slate-900/50 border border-white/10 rounded-3xl p-6 flex flex-col items-center gap-5">
-              <motion.div
-                key={currentProblem?.id}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="text-6xl font-black text-white tracking-tighter h-16 flex items-center"
-              >
-                {currentProblem?.question}
-              </motion.div>
+            <div className="kid-card p-5 flex flex-col items-center gap-4">
+              <Mascot mood={mood} size={80} />
+              <div className="flex flex-col items-center">
+                <motion.div
+                  key={currentProblem?.id}
+                  initial={{ scale: 0.7, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="font-display text-6xl text-[#2b1d57] tabular-nums tracking-tight"
+                >
+                  {currentProblem?.question}
+                </motion.div>
+                {nextProblem && (
+                  <div className="font-display text-base text-[#2b1d57]/25 tabular-nums mt-1">
+                    ถัดไป · {nextProblem.question}
+                  </div>
+                )}
+              </div>
 
               <div
                 className={cn(
-                  'w-full bg-slate-950/80 border-[4px] rounded-3xl py-5 text-5xl font-black text-center transition-all min-h-[5rem] flex items-center justify-center',
-                  feedback === 'correct' ? 'border-green-400 text-green-400' :
-                  feedback === 'incorrect' ? 'border-red-500 text-red-500 animate-shake' :
-                  'border-slate-800 text-white'
+                  'w-full bg-white border-4 rounded-3xl py-5 text-5xl font-display text-center min-h-[5rem] flex items-center justify-center',
+                  feedback === 'correct' ? 'border-[#5ddc7e] text-[#5ddc7e] kid-pop' :
+                  feedback === 'incorrect' ? 'border-[#ff5a6a] text-[#ff5a6a] kid-shake' :
+                  'border-[#9b6dff]/30 text-[#2b1d57]'
                 )}
               >
-                {userAnswer || <span className="text-slate-700">?</span>}
+                {userAnswer || <span className="text-[#2b1d57]/20">?</span>}
               </div>
 
               <Numpad onInput={handleInput} onDelete={handleDelete} onSubmit={submit} />
-
-              {nextProblem && (
-                <div className="flex items-center justify-center gap-3 opacity-50">
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em]">Next</span>
-                  <span className="text-xl font-black text-slate-400">{nextProblem.question}</span>
-                </div>
-              )}
             </div>
           </div>
         )}
 
-        {/* Finished (mine or both) */}
+        {/* Finished */}
         {(finished || room.status === 'finished') && (
-          <div className="space-y-5">
-            <div className="bg-slate-900/50 border border-white/10 rounded-3xl p-6 text-center">
-              <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-3 animate-bounce" />
-              <h2 className="text-3xl font-black uppercase italic text-white">
-                {room.status === 'finished' ? 'BATTLE OVER' : 'WAITING OPPONENT'}
+          <div className="space-y-4">
+            <div className="kid-card p-5 text-center">
+              <Mascot mood="cheer" size={110} />
+              <Trophy className="w-12 h-12 text-[#ffd23f] mx-auto mt-2 kid-bounce" />
+              <h2 className="font-display text-3xl text-[#2b1d57] mt-2">
+                {room.status === 'finished' ? 'จบดวล!' : 'รอคู่แข่ง...'}
               </h2>
             </div>
 
@@ -405,28 +418,26 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                 const isMe = idx === 0;
                 const myScore = me?.[1].correct ?? 0;
                 const oppScore = opponent?.[1].correct ?? 0;
-                const isWinner = room.status === 'finished' && (
-                  (isMe && myScore > oppScore) || (!isMe && oppScore > myScore)
-                );
+                const isWinner = room.status === 'finished' && ((isMe && myScore > oppScore) || (!isMe && oppScore > myScore));
                 const isTie = room.status === 'finished' && myScore === oppScore;
                 return (
                   <div
                     key={idx}
                     className={cn(
-                      'p-5 rounded-3xl border-2 text-center',
-                      isWinner ? 'bg-yellow-500/15 border-yellow-500/50' :
-                      isMe ? 'bg-purple-500/10 border-purple-500/30' :
-                      'bg-cyan-500/10 border-cyan-500/30'
+                      'p-4 rounded-3xl border-4 text-center',
+                      isWinner ? 'bg-[#ffd23f]/20 border-[#ffd23f]' :
+                      isMe ? 'bg-[#9b6dff]/15 border-[#9b6dff]' :
+                      'bg-[#4cc9ff]/15 border-[#4cc9ff]'
                     )}
                   >
-                    {isWinner && <Crown className="w-6 h-6 text-yellow-400 mx-auto mb-2" />}
-                    {isTie && <p className="text-[9px] font-black text-yellow-400 uppercase mb-2">TIE</p>}
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
-                      {isMe ? 'YOU' : data?.name}
+                    {isWinner && <Crown className="w-7 h-7 text-[#ffd23f] mx-auto mb-1" />}
+                    {isTie && <p className="text-xs font-bold text-[#ff9a3c] uppercase mb-1">เสมอ</p>}
+                    <p className="text-xs font-bold text-[#2b1d57]/60">
+                      {isMe ? 'หนู' : data?.name}
                     </p>
-                    <p className="text-4xl font-black text-white tabular-nums">{data?.correct ?? 0}</p>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-2">
-                      Wrong {data?.incorrect ?? 0} · Best Streak {data?.bestStreak ?? 0}
+                    <p className="font-display text-4xl text-[#2b1d57] tabular-nums">{data?.correct ?? 0}</p>
+                    <p className="text-[10px] font-bold text-[#2b1d57]/60 mt-1">
+                      ผิด {data?.incorrect ?? 0} · ติดสุด {data?.bestStreak ?? 0}
                     </p>
                   </div>
                 );
@@ -435,22 +446,14 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
             <button
               onClick={handleLeave}
-              className="w-full py-4 bg-white text-slate-950 rounded-2xl text-lg font-black uppercase italic tracking-widest shadow-[0_6px_0_rgb(226,232,240)] active:shadow-none active:translate-y-[6px]"
+              className="kid-btn w-full py-4 text-xl font-display text-white gap-3"
+              style={{ background: 'linear-gradient(160deg, #4cc9ff, #5ddc7e)' }}
             >
-              BACK TO LOBBY
+              กลับ Lobby
             </button>
           </div>
         )}
       </div>
-
-      <style jsx global>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-10px); }
-          75% { transform: translateX(10px); }
-        }
-        .animate-shake { animation: shake 0.2s ease-in-out 2; }
-      `}</style>
     </main>
   );
 }
