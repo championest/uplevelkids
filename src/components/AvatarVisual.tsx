@@ -24,16 +24,16 @@ export default function AvatarVisual({ size = 'md', className }: AvatarVisualPro
 
   const getHatIcon = () => {
     switch (state.equipped.hat) {
-      case 'hat_1': return <GraduationCap className="w-1/2 h-1/2 text-[#9b6dff]" />;
-      case 'hat_2': return <Crown className="w-1/2 h-1/2 text-[#ffd23f]" />;
+      case 'hat_1': return <GraduationCap className="w-full h-full text-[#9b6dff]" strokeWidth={2.5} />;
+      case 'hat_2': return <Crown className="w-full h-full text-[#ffd23f] fill-[#ffd23f]" strokeWidth={2} />;
       default: return null;
     }
   };
 
   const getPetIcon = () => {
     switch (state.equipped.pet) {
-      case 'pet_1': return <Dog className="w-1/2 h-1/2 text-[#ff9a3c]" />;
-      case 'pet_2': return <Cat className="w-1/2 h-1/2 text-[#9b6dff]" />;
+      case 'pet_1': return <Dog className="w-3/4 h-3/4 text-[#ff9a3c]" strokeWidth={2.5} />;
+      case 'pet_2': return <Cat className="w-3/4 h-3/4 text-[#9b6dff]" strokeWidth={2.5} />;
       default: return null;
     }
   };
@@ -55,25 +55,25 @@ export default function AvatarVisual({ size = 'md', className }: AvatarVisualPro
       {/* Mascot body */}
       <Mascot mood="happy" size={px} className="relative z-10" />
 
-      {/* Hat */}
+      {/* Hat — sits on top of the head, within bounds so overflow-hidden parents don't clip it */}
       {state.equipped.hat && (
         <motion.div
           animate={{ y: [0, -3, 0] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -top-[18%] z-20 flex items-center justify-center"
-          style={{ width: px * 0.55, height: px * 0.55 }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center drop-shadow-lg"
+          style={{ width: px * 0.55, height: px * 0.4 }}
         >
           {getHatIcon()}
         </motion.div>
       )}
 
-      {/* Pet */}
+      {/* Pet — bottom-right corner, fully inside avatar box */}
       {state.equipped.pet && (
         <motion.div
-          animate={{ x: [0, 4, 0], y: [0, -3, 0] }}
+          animate={{ x: [0, 3, 0], y: [0, -2, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -right-[20%] -bottom-[6%] z-20 bg-white rounded-2xl border-2 border-white shadow flex items-center justify-center"
-          style={{ width: px * 0.45, height: px * 0.45 }}
+          className="absolute right-0 bottom-0 z-30 bg-white rounded-2xl border-2 border-white shadow flex items-center justify-center"
+          style={{ width: px * 0.38, height: px * 0.38 }}
         >
           {getPetIcon()}
         </motion.div>

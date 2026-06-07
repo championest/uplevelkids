@@ -8,7 +8,7 @@ import { useGame } from "@/lib/GameContext";
 import { ACHIEVEMENTS, getXpInCurrentLevel, XP_PER_LEVEL } from "@/lib/rpg";
 import { cn } from "@/lib/utils";
 import { useLeaderboardSync } from "@/lib/useLeaderboardSync";
-import Mascot from "@/components/Mascot";
+import AvatarVisual from "@/components/AvatarVisual";
 import AvatarStore from "@/components/AvatarStore";
 import DailyBonus from "@/components/DailyBonus";
 
@@ -75,8 +75,11 @@ export default function Home() {
         {/* Hero card with Mascot + welcome */}
         <section className="kid-card p-6 relative overflow-hidden">
           <div className="absolute -top-6 -right-4 text-5xl kid-sparkle">✨</div>
+          <div className="absolute top-3 right-3 z-20">
+            <AvatarStore />
+          </div>
           <div className="flex items-center gap-4">
-            <Mascot mood="happy" size={120} />
+            <AvatarVisual size="xl" />
             <div className="flex-1">
               <h1 className="font-display text-3xl text-[#2b1d57] leading-tight">
                 เฮ้! 👋
@@ -137,11 +140,6 @@ export default function Home() {
             </Link>
           ))}
         </nav>
-
-        {/* Shop button row */}
-        <div className="flex justify-center">
-          <AvatarStore />
-        </div>
 
         {/* Achievements / Badges */}
         <section className="space-y-3">
